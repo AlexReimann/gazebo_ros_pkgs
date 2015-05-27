@@ -195,10 +195,10 @@ void GazeboRosDiffDrive::publishWheelTF()
 {
     ros::Time current_time = ros::Time::now();
     for ( int i = 0; i < 2; i++ ) {
-        
+
         std::string wheel_frame = gazebo_ros_->resolveTF(joints_[i]->GetChild()->GetName ());
         std::string wheel_parent_frame = gazebo_ros_->resolveTF(joints_[i]->GetParent()->GetName ());
-        
+
         math::Pose poseWheel = joints_[i]->GetChild()->GetRelativePose();
 
         tf::Quaternion qt ( poseWheel.rot.x, poseWheel.rot.y, poseWheel.rot.z, poseWheel.rot.w );
@@ -356,7 +356,7 @@ void GazeboRosDiffDrive::UpdateOdometryEncoder()
 
 void GazeboRosDiffDrive::publishOdometry ( double step_time )
 {
-   
+
     ros::Time current_time = ros::Time::now();
     std::string odom_frame = gazebo_ros_->resolveTF ( odometry_frame_ );
     std::string base_footprint_frame = gazebo_ros_->resolveTF ( robot_base_frame_ );
@@ -369,6 +369,14 @@ void GazeboRosDiffDrive::publishOdometry ( double step_time )
         qt = tf::Quaternion ( odom_.pose.pose.orientation.x, odom_.pose.pose.orientation.y, odom_.pose.pose.orientation.z, odom_.pose.pose.orientation.w );
         vt = tf::Vector3 ( odom_.pose.pose.position.x, odom_.pose.pose.position.y, odom_.pose.pose.position.z );
 
+        math::Pose pose = parent->GetWorldPose();
+        math::Vector3 linear;
+        linear = parent->GetWorldLinearVel();
+
+        // convert velocity to child_frame_id (aka base_footprint)
+        float yaw = pose.rot.GetYaw();
+        odom_.twist.twist.linear.x = cosf ( yaw ) * linear.x + sinf ( yaw ) * linear.y;
+        odom_.twist.twist.linear.y = cosf ( yaw ) * linear.y - sinf ( yaw ) * linear.x;
     }
     if ( odom_source_ == WORLD ) {
         // getting data form gazebo world

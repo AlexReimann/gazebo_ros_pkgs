@@ -25,6 +25,8 @@ find_package(catkin REQUIRED COMPONENTS
   polled_camera
   diagnostic_updater
   camera_info_manager
+  moveit_msgs
+  std_msgs
 )
 
 include (FindPkgConfig)
@@ -124,6 +126,8 @@ catkin_package(
   image_transport 
   rosconsole
   camera_info_manager
+  moveit_msgs
+  std_msgs
   DEPENDS 
     gazebo 
     SDF
@@ -247,6 +251,9 @@ target_link_libraries(gazebo_ros_hand_of_god ${GAZEBO_LIBRARIES} ${SDFormat_LIBR
 
 add_library(gazebo_ros_ft_sensor src/gazebo_ros_ft_sensor.cpp)
 target_link_libraries(gazebo_ros_ft_sensor ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_library(gazebo_ros_range src/gazebo_ros_range.cpp)
+target_link_libraries(gazebo_ros_range ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} RayPlugin)
 
 ##
 ## Add your new plugin here
